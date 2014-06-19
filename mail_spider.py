@@ -121,7 +121,7 @@ class MyCrawler:
                     cursor = mydb.cursor()
                     valuesToInsert = [order,ix]
                     try:
-                        cursor.execute('insert into table_name values(%s,%s)',valuesToInsert)
+                        cursor.execute("INSERT INTO `gjh-enterprise`(`order`, `mailAddress`) VALUES (%s,%s)",valuesToInsert)
                     except MySQLdb.Error,e:
                         print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
                     order += 1    
