@@ -12,7 +12,6 @@ dbname = "bxWXpbFfNCAATdSdSaQh"
 api_key = "mpbluSASap9EPbqnFQ39WPDK"
 secret_key = "GHqF6rGnw5X80XTOUCRnPTMbUkaTlIa8"
 table_name = "gjh-enterprise"
-order = 1
 
 
 mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z.]+)")
@@ -24,6 +23,7 @@ origin_url = "http://www.gjh-enterprise.com/"
 
 class MyCrawler:
     def __init__(self,seeds):
+        self.order = 1
         #u"使用种子初始化url队列"
         self.linkQuence=linkQuence()
         if isinstance(seeds,str):
@@ -36,6 +36,7 @@ class MyCrawler:
 
     #u"抓取过程主函数"
     def crawling(self,seeds,crawl_count):
+
         #u"循环条件：待抓取的链接不空且专区的网页不多于crawl_count"
         while self.linkQuence.unVisitedUrlsEnmpy() is False and self.linkQuence.getVisitedUrlCount()<=crawl_count:
             #u"队头url出队列"
@@ -119,14 +120,13 @@ class MyCrawler:
                       passwd = secret_key,
                       db = dbname)
                     cursor = mydb.cursor()
-                    valuesToInsert = [order,ix]
+                    valuesToInsert = [self.order,ix]
                     try:
                         n=cursor.execute("INSERT INTO `gjh-enterprise`(`order`, `mailAddress`) VALUES (%s,%s)",valuesToInsert)
                         print n
                     except MySQLdb.Error,e:
                         print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
-                    global order    
-                    order += 1    
+                    self.order += 1    
                     mydb.commit()    
                     cursor.close()       
                     mydb.close()
