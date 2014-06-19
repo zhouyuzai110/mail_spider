@@ -14,7 +14,7 @@ secret_key = "GHqF6rGnw5X80XTOUCRnPTMbUkaTlIa8"
 table_name = "gjh-enterprise"
 
 
-mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z.]+)")
+mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z.-]+)")
 # mailre = re.compile(r"^[a-zA-Z][a-zA-Z0-9_.-]*@[0-9a-zA-Z]+(.[a-zA-Z]+)+$")
 mail_out = open("mail_out.txt","a")
 mail_list = []
@@ -38,7 +38,7 @@ class MyCrawler:
     def crawling(self,seeds,crawl_count):
 
         #u"循环条件：待抓取的链接不空且专区的网页不多于crawl_count"
-        while self.linkQuence.unVisitedUrlsEnmpy() is False and self.linkQuence.getVisitedUrlCount()<=crawl_count:
+        while self.linkQuence.unVisitedUrlsEnmpy() is False and self.linkQuence.getVisitedUrlCount() <= crawl_count:
             #u"队头url出队列"
             visitUrl=self.linkQuence.unVisitedUrlDeQuence()
             print "Pop out one url \"%s\" from unvisited url list"%visitUrl
@@ -63,19 +63,23 @@ class MyCrawler:
         links=[]
         data=self.getPageSource(url)
         if data[0]=="200":
-            soup=BeautifulSoup(data[1])
-            a=soup.findAll("a",{"href":re.compile(".*")})
-            for i in a:
-                if "index" in i["href"] and "index" not in url:
-                    target_link = url + i["href"]
-                    links.append(target_link) 
-                elif "index" in i["href"] and "index"  in url:
-                    newUrl = re.sub("index-\d+.html","",url) + i["href"]
-                    links.append(newUrl)
-                else:
-                    target_link = origin_url + i["href"]
-                    links.append(target_link) 
-        return links
+            try：
+                soup=BeautifulSoup(data[1])
+                a=soup.findAll("a",{"href":re.compile(".*")})
+                for i in a:
+                    if "index" in i["href"] and "index" not in url:
+                        target_link = url + i["href"]
+                        links.append(target_link) 
+                    elif "index" in i["href"] and "index"  in url:
+                        newUrl = re.sub("index-\d+.html","",url) + i["href"]
+                        links.append(newUrl)
+                    else:
+                        target_link = origin_url + i["href"]
+                        links.append(target_link) 
+                return links
+        except Exception,e:
+            print str(e):
+
     
 
     #u"获取网页源码"
