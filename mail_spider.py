@@ -63,7 +63,7 @@ class MyCrawler:
         links=[]
         data=self.getPageSource(url)
         if data[0]=="200":
-            try：
+            try:
                 soup=BeautifulSoup(data[1])
                 a=soup.findAll("a",{"href":re.compile(".*")})
                 for i in a:
