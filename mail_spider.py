@@ -107,9 +107,9 @@ class MyCrawler:
             mail_response = urllib2.urlopen(mail_req)
             mail_html = mail_response.read()
             mail_target = mailre.findall(mail_html)
-            print mail_target
             for ix in mail_target:
                 if ix not in mail_list:
+                    # print ix
                     mail_list.append(ix)
                     # mail_out.write(ix)
                     # mail_out.write("\n")
@@ -123,7 +123,7 @@ class MyCrawler:
                     valuesToInsert = [self.order,ix]
                     try:
                         n=cursor.execute("INSERT INTO `gjh-enterprise`(`order`, `mailAddress`) VALUES (%s,%s)",valuesToInsert)
-                        print n
+                        # print n
                     except MySQLdb.Error,e:
                         print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
                     self.order += 1    
@@ -179,9 +179,5 @@ def main(seeds,crawl_count):
     craw=MyCrawler(seeds)
     craw.crawling(seeds,crawl_count)
 if __name__=="__main__":
-
-    
-
     main("http://www.gjh-enterprise.com/",3000000)
     # main(["http://www.baidu.com","http://www.google.com.hk"],50)
-    mydb.close()
