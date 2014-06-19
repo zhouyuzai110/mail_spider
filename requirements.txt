@@ -1,1 +1,2 @@
 BeautifulSoup4==4.3.2
+MySQLdb==1.2.4
