@@ -77,8 +77,8 @@ class MyCrawler:
                         target_link = origin_url + i["href"]
                         links.append(target_link) 
                 return links
-        except Exception,e:
-            print str(e):
+            except Exception,e:
+                print str(e):
 
     
 
