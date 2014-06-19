@@ -125,6 +125,7 @@ class MyCrawler:
                         print n
                     except MySQLdb.Error,e:
                         print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
+                    global order    
                     order += 1    
                     mydb.commit()    
                     cursor.close()       
