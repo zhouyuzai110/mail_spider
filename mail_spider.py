@@ -112,16 +112,22 @@ class MyCrawler:
                     mail_list.append(ix)
                     # mail_out.write(ix)
                     # mail_out.write("\n")
+                    mydb = MySQLdb.connect(
+                      host   = "sqld.duapp.com",
+                      port   = 4050,
+                      user   = api_key,
+                      passwd = secret_key,
+                      db = dbname)
                     cursor = mydb.cursor()
                     valuesToInsert = [order,ix]
                     try:
-                        cursor.execute('insert into table_name values(%d,%s)',valuesToInsert)
+                        cursor.execute('insert into table_name values(%s,%s)',valuesToInsert)
                     except MySQLdb.Error,e:
                         print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
                     order += 1    
                     mydb.commit()    
                     cursor.close()       
-                    
+                    mydb.close()
                 
         except Exception as e:
             print str(e)
@@ -172,12 +178,7 @@ def main(seeds,crawl_count):
     craw.crawling(seeds,crawl_count)
 if __name__=="__main__":
 
-    mydb = MySQLdb.connect(
-      host   = "sqld.duapp.com",
-      port   = 4050,
-      user   = api_key,
-      passwd = secret_key,
-      db = dbname)
+    
 
     main("http://www.gjh-enterprise.com/",3000000)
     # main(["http://www.baidu.com","http://www.google.com.hk"],50)
