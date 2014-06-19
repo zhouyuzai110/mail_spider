@@ -78,7 +78,8 @@ class MyCrawler:
                         links.append(target_link) 
                 return links
             except Exception,e:
-                print str(e):
+                print str(e)
+                
 
     
 
