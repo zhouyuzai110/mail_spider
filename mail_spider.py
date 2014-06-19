@@ -6,6 +6,13 @@ from bs4 import BeautifulSoup
 import socket
 import urllib2
 import re
+import MySQLdb
+
+dbname = "bxWXpbFfNCAATdSdSaQh"
+api_key = "mpbluSASap9EPbqnFQ39WPDK"
+secret_key = "GHqF6rGnw5X80XTOUCRnPTMbUkaTlIa8"
+table_name = "gjh-enterprise"
+order = 1
 
 
 mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z.]+)")
@@ -103,8 +110,18 @@ class MyCrawler:
             for ix in mail_target:
                 if ix not in mail_list:
                     mail_list.append(ix)
-                    mail_out.write(ix)
-                    mail_out.write("\n")
+                    # mail_out.write(ix)
+                    # mail_out.write("\n")
+                    cursor = mydb.cursor()
+                    valuesToInsert = [order,ix]
+                    try:
+                        cursor.execute('insert into table_name values(%d,%s)',%(order,ix))
+                    except MySQLdb.Error,e:
+                        print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
+                    order += 1    
+                    mydb.commit()    
+                    cursor.close()       
+                    
                 
         except Exception as e:
             print str(e)
@@ -154,6 +171,14 @@ def main(seeds,crawl_count):
     craw=MyCrawler(seeds)
     craw.crawling(seeds,crawl_count)
 if __name__=="__main__":
+
+    mydb = MySQLdb.connect(
+      host   = "sqld.duapp.com",
+      port   = 4050,
+      user   = api_key,
+      passwd = secret_key,
+      db = dbname)
+
     main("http://www.gjh-enterprise.com/",3000000)
     # main(["http://www.baidu.com","http://www.google.com.hk"],50)
-    mail_list.close()
+    mydb.close()
