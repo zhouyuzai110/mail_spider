@@ -39,23 +39,25 @@ class MyCrawler:
 
         #u"循环条件：待抓取的链接不空且专区的网页不多于crawl_count"
         while self.linkQuence.unVisitedUrlsEnmpy() is False and self.linkQuence.getVisitedUrlCount() <= crawl_count:
-            #u"队头url出队列"
-            visitUrl=self.linkQuence.unVisitedUrlDeQuence()
-            print "Pop out one url \"%s\" from unvisited url list"%visitUrl
-            if visitUrl is None or visitUrl=="":
-                continue
-            #u"获取超链接"
-            links=self.getHyperLinks(visitUrl)
-            print "Get %d new links"%len(links)
-            #u"将url放入已访问的url中"
-            self.linkQuence.addVisitedUrl(visitUrl)
-            self.getEmailAddress(visitUrl)
-            print "Visited url count: "+str(self.linkQuence.getVisitedUrlCount())
-            #u"未访问的url入列"
-            for link in links:
-                self.linkQuence.addUnvisitedUrl(link)
-                # self.getEmailAddress(link)
-            print "%d unvisited links:"%len(self.linkQuence.getUnvisitedUrl())
+            try:
+                #u"队头url出队列"
+                visitUrl=self.linkQuence.unVisitedUrlDeQuence()
+                print "Pop out one url \"%s\" from unvisited url list"%visitUrl
+                if visitUrl is None or visitUrl=="":
+                    continue
+                #u"获取超链接"
+                links=self.getHyperLinks(visitUrl)
+                print "Get %d new links"%len(links)
+                #u"将url放入已访问的url中"
+                self.linkQuence.addVisitedUrl(visitUrl)
+                self.getEmailAddress(visitUrl)
+                print "Visited url count: "+str(self.linkQuence.getVisitedUrlCount())
+                #u"未访问的url入列"
+                for link in links:
+                    self.linkQuence.addUnvisitedUrl(link)
+                print "%d unvisited links:"%len(self.linkQuence.getUnvisitedUrl())
+            except Exception,e:
+                print str(e)    
 
             
     #u"获取源码中得超链接"
@@ -79,6 +81,7 @@ class MyCrawler:
             return links
         except Exception,e:
             print str(e)
+            return None
                 
 
     
