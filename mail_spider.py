@@ -146,7 +146,7 @@ class MyCrawler:
 class linkQuence:
     def __init__(self):
         #u"已访问的url集合"
-        self.visted=[]
+        self.visted=["http://en.gjh-enterprise.com/"]
         #u"待访问的url集合"
         self.unVisited=[]
     #u"获取访问过的url队列"
