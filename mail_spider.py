@@ -16,7 +16,6 @@ table_name = "gjh-enterprise"
 
 mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z.-]+)")
 # mailre = re.compile(r"^[a-zA-Z][a-zA-Z0-9_.-]*@[0-9a-zA-Z]+(.[a-zA-Z]+)+$")
-mail_out = open("mail_out.txt","a")
 mail_list = []
 origin_url = "http://www.gjh-enterprise.com/"
 
@@ -58,8 +57,29 @@ class MyCrawler:
                 print "%d unvisited links:"%len(self.linkQuence.getUnvisitedUrl())
             except Exception,e:
                 print str(e)    
+   
 
-            
+    #u"获取网页源码"
+    def getPageSource(self,url,timeout=20,coding=None):
+        try:
+            socket.setdefaulttimeout(timeout)
+            req = urllib2.Request(url)
+            req.add_header('User-agent', 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)')
+            response = urllib2.urlopen(req)
+            if coding is None:
+                coding= response.headers.getparam("charset")
+            if coding is None:
+                page=response.read()
+            else:
+                page=response.read()
+                page=page.decode(coding).encode('utf-8')
+
+            return ["200",page]
+        except Exception,e:
+            print str(e)
+            return [str(e),None]
+    
+
     #u"获取源码中得超链接"
     def getHyperLinks(self,url):
         try:
@@ -82,32 +102,11 @@ class MyCrawler:
         except Exception,e:
             print str(e)
             return None
-                
 
-    
 
-    #u"获取网页源码"
-    def getPageSource(self,url,timeout=1,coding=None):
-        try:
-            socket.setdefaulttimeout(timeout)
-            req = urllib2.Request(url)
-            req.add_header('User-agent', 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)')
-            response = urllib2.urlopen(req)
-            if coding is None:
-                coding= response.headers.getparam("charset")
-            if coding is None:
-                page=response.read()
-            else:
-                page=response.read()
-                page=page.decode(coding).encode('utf-8')
 
-            return ["200",page]
-        except Exception,e:
-            print str(e)
-            return [str(e),None]
-    
-
-    def getEmailAddress(self,url,timeout=1):
+    #u"获取源码中得邮箱地址"
+    def getEmailAddress(self,url,timeout=20):
         try:
             socket.setdefaulttimeout(timeout)
             mail_req = urllib2.Request(url)
@@ -141,7 +140,7 @@ class MyCrawler:
                 
         except Exception as e:
             print str(e)
-            return [str(e),None]    
+            return None   
 
 
 class linkQuence:
@@ -184,7 +183,7 @@ class linkQuence:
    
 
 def main(seeds,crawl_count):
-    craw=MyCrawler(seeds)
+    craw = MyCrawler(seeds)
     craw.crawling(seeds,crawl_count)
 if __name__=="__main__":
     main("http://www.gjh-enterprise.com/",3000000)
