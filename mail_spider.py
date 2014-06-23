@@ -21,7 +21,7 @@ origin_url = "http://www.gjh-enterprise.com/"
 class MyCrawler:
     def __init__(self,seeds):
         #u"使用种子初始化url队列"
-        self.MySQLQuence=MySQLQuence()
+        self.MySQLQuence=MySQLQuence(host='sqld.duapp.com', port = 4050, user = api_key, passwd = secret_key, db = dbname)
         if isinstance(seeds,str):
             self.MySQLQuence.addUnvisitedUrl(seeds)
             print "Add the seeds url \"%s\" to the unvisited url list" %seeds
@@ -144,8 +144,8 @@ class MySQLQuence:
  
     #u"保证每个url只被访问一次,插入的链接唯一"    
     def addUnvisitedUrl(self,url):
-        # sql = "INSERT INTO `linkQuence`(`linkAddress`,`visited`) SELECT %s,"0" FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s)"
-        self.cursor.execute("INSERT INTO `linkQuence`(`linkAddress`,`visited`) SELECT %s,"0" FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s)",[url,url])
+        sql = "INSERT INTO `linkQuence`(`linkAddress`,`visited`) SELECT %s,"0" FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s)"
+        self.cursor.execute(sql,[url,url])
         self.conn.commit()    
         self.cursor.close()       
         self.conn.close()
