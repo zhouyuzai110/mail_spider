@@ -62,7 +62,7 @@ class MyCrawler:
                     self.MySQLQuence7 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
                     self.MySQLQuence7.addUnvisitedUrl(link)
                 self.MySQLQuence8 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)    
-                print "%d unvisited links:" %self.MySQLQuence8.getUnVisitedUrlCount()
+                print "%s unvisited links:" %self.MySQLQuence8.getUnVisitedUrlCount()
             except Exception,e:
                 print str(e)    
 
@@ -186,8 +186,8 @@ class MySQLQuence:
 
     #u"访问过得url visited 变成1"
     def addVisitedUrl(self,url):
-        sql = "UPDATE `linkQuence` SET visited = 1 WHERE linkAddress = %s "
-        self.cursor.execute(sql,[url])
+        sql = "UPDATE `linkQuence` SET `visited` = %s WHERE linkAddress = %s "
+        self.cursor.execute(sql,[1,url])
         self.cursor.close()       
         self.conn.close()
 
