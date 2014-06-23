@@ -60,7 +60,7 @@ class MyCrawler:
                 #u"未访问的url入列"
                 for link in links:
                     self.MySQLQuence7 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                    self.MySQLQuence7.addUnvisitedUrl([link,link])
+                    self.MySQLQuence7.addUnvisitedUrl(link)
                 self.MySQLQuence8 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)    
                 print "%d unvisited links:" %self.MySQLQuence8.getUnVisitedUrlCount()
             except Exception,e:
@@ -170,7 +170,7 @@ class MySQLQuence:
 
     #u"获得已访问的url数目"
     def getVisitedUrlCount(self):
-        sql = "SELECT * from linkQuence where visited = 1" 
+        sql = "SELECT * from `linkQuence` where visited = 1" 
         count = self.cursor.execute(sql)
         return count 
         self.cursor.close()       
@@ -178,7 +178,7 @@ class MySQLQuence:
           
     #u"获得未访问的url数目"
     def getUnVisitedUrlCount(self):
-        sql = "SELECT * from linkQuence where visited = 0"
+        sql = "SELECT * from `linkQuence` where visited = 0"
         count = self.cursor.execute(sql)
         return count  
         self.cursor.close()       
@@ -186,14 +186,14 @@ class MySQLQuence:
 
     #u"访问过得url visited 变成1"
     def addVisitedUrl(self,url):
-        sql = "UPDATE linkQuence SET visited = '1' WHERE linkAddress = %s "
+        sql = "UPDATE `linkQuence` SET visited = 1 WHERE linkAddress = %s "
         self.cursor.execute(sql,[url])
         self.cursor.close()       
         self.conn.close()
 
     #u"判断未访问的url队列是否为空"
     def unVisitedUrlsEnmpy(self):
-        sql = "SELECT * from linkQuence where visited = 0"
+        sql = "SELECT * from `linkQuence` where visited = 0"
         count = self.cursor.execute(sql)
         return count == 0 
         self.cursor.close()       
@@ -203,7 +203,7 @@ class MySQLQuence:
     #u"未访问过得url出队列"
     def unVisitedUrlDeQuence(self):
         try:
-            sql = "SELECT linkAddress from linkQuence where visited = 0 limit 1"
+            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 1"
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
             return str(row[0])
