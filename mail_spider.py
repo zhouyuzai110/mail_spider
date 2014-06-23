@@ -36,8 +36,10 @@ class MyCrawler:
         #u"循环条件：待抓取的链接不空且抓取的网页不多于crawl_count"
         self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
         unVisitedUrlsEnmpy = self.MySQLQuence.unVisitedUrlsEnmpy()
+        print unVisitedUrlsEnmpy
         self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
         VisitedUrlCount = self.MySQLQuence.getVisitedUrlCount()
+        print VisitedUrlCount
         while  unVisitedUrlsEnmpy is False and VisitedUrlCount <= crawl_count:
             try:
                 #u"队头url出队列"
