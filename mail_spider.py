@@ -187,7 +187,7 @@ class MySQLQuence:
     #u"访问过得url visited 变成1"
     def addVisitedUrl(self,url):
         sql = "UPDATE `linkQuence` SET `visited` = %s WHERE linkAddress = %s "
-        self.cursor.execute(sql,[1,url])
+        self.cursor.execute(sql,["1",url])
         self.cursor.close()       
         self.conn.close()
 
