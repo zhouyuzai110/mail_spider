@@ -21,22 +21,23 @@ origin_url = "http://www.gjh-enterprise.com/"
 class MyCrawler:
     def __init__(self,seeds):
         #u"使用种子初始化url队列"
-        self.linkQuence=linkQuence()
+        self.MySQLQuence=MySQLQuence()
         if isinstance(seeds,str):
-            self.linkQuence.addUnvisitedUrl(seeds)
+            self.MySQLQuence.addUnvisitedUrl(seeds)
+            print "Add the seeds url \"%s\" to the unvisited url list" %seeds
         if isinstance(seeds,list):
             for i in seeds:
-                self.linkQuence.addUnvisitedUrl(i)
-        print "Add the seeds url \"%s\" to the unvisited url list"%str(self.linkQuence.unVisited)
+                self.MySQLQuence.addUnvisitedUrl(i)
+        # print "Add the seeds url \"%s\" to the unvisited url list"%str(self.MySQLQuence.unVisited)
     
 
     #u"抓取过程主函数"
     def crawling(self,seeds,crawl_count):
-        #u"循环条件：待抓取的链接不空且专区的网页不多于crawl_count"
-        while self.linkQuence.unVisitedUrlsEnmpy() is False and self.linkQuence.getVisitedUrlCount()<=crawl_count:
+        #u"循环条件：待抓取的链接不空且抓取的网页不多于crawl_count"
+        while self.MySQLQuence.unVisitedUrlsEnmpy() is False and self.MySQLQuence.getVisitedUrlCount()<=crawl_count:
             try:
                 #u"队头url出队列"
-                visitUrl=self.linkQuence.unVisitedUrlDeQuence()
+                visitUrl=self.MySQLQuence.unVisitedUrlDeQuence()
                 print "Pop out one url \"%s\" from unvisited url list"%visitUrl
                 if visitUrl is None or visitUrl=="":
                     continue
@@ -44,13 +45,13 @@ class MyCrawler:
                 links=self.getHyperLinks(visitUrl)
                 print "Get %d new links"%len(links)
                 #u"将url放入已访问的url中"
-                self.linkQuence.addVisitedUrl(visitUrl)
+                self.MySQLQuence.addVisitedUrl(visitUrl)
                 self.getEmailAddress(visitUrl)
-                print "Visited url count: "+str(self.linkQuence.getVisitedUrlCount())
+                print "Visited url count: "+str(self.MySQLQuence.getVisitedUrlCount())
                 #u"未访问的url入列"
                 for link in links:
-                    self.linkQuence.addUnvisitedUrl(link)
-                print "%d unvisited links:"%len(self.linkQuence.getUnvisitedUrl())
+                    self.MySQLQuence.addUnvisitedUrl([link,link])
+                print "%d unvisited links:" %self.MySQLQuence.getUnVisitedUrlCount()
             except Exception,e:
                 print str(e)    
 
@@ -128,46 +129,75 @@ class MyCrawler:
         except Exception as e:
             print str(e)
             return None   
+   
 
 
-class linkQuence:
-    def __init__(self):
-        #u"已访问的url集合"
-        self.visted=[]
-        #u"待访问的url集合"
-        self.unVisited=[]
-    #u"获取访问过的url队列"
-    def getVisitedUrl(self):
-        return self.visted
-    #u"获取未访问的url队列"
-    def getUnvisitedUrl(self):
-        return self.unVisited
-    #u"添加到访问过得url队列中"
+class MySQLQuence:
+    def __init__(self, host='sqld.duapp.com', port = 4050, user = api_key, passwd = secret_key, db = dbname):
+        try:
+            self.conn = MySQLdb.connect(host,port,user,passwd,db)
+        except MySQLdb.Error,e:
+            errormsg = 'Cannot connect to server\nERROR (%s): %s' %(e.args[0],e.args[1])
+            print errormsg
+        self.cursor = self.conn.cursor()
+
+ 
+    #u"保证每个url只被访问一次,插入的链接唯一"    
+    def addUnvisitedUrl(self,url):
+        sql = "INSERT INTO `linkQuence`(`linkAddress`,`visited`) SELECT %s,"0" FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s)"
+        self.cursor.execute(sql,[url,url])
+        self.conn.commit()    
+        self.cursor.close()       
+        self.conn.close()
+
+
+    #u"获得已访问的url数目"
+    def getVisitedUrlCount(self):
+        sql = "select * from linkQuence where visited = "1""
+        count = self.cursor.execute(sql)
+        return count 
+        self.cursor.close()       
+        self.conn.close()   
+          
+    #u"获得未访问的url数目"
+    def getUnVisitedUrlCount(self):
+        sql = "select * from linkQuence where visited = "0""
+        count = self.cursor.execute(sql)
+        return count  
+        self.cursor.close()       
+        self.conn.close()  
+
+    #u"访问过得url visited 变成1"
     def addVisitedUrl(self,url):
-        self.visted.append(url)
-    #u"移除访问过得url"
-    def removeVisitedUrl(self,url):
-        self.visted.remove(url)
+        sql = "UPDATE linkQuence SET visited = '1' WHERE linkAddress = %s "
+        self.cursor.execute(sql,[url])
+        self.cursor.close()       
+        self.conn.close()
+
+    #u"判断未访问的url队列是否为空"
+    def unVisitedUrlsEnmpy(self):
+        sql = "select * from linkQuence where visited = "0""
+        count = self.cursor.execute(sql)
+        return count == 0 
+        self.cursor.close()       
+        self.conn.close()   
+
+
     #u"未访问过得url出队列"
     def unVisitedUrlDeQuence(self):
         try:
-            return self.unVisited.pop()
+            sql = "select linkAddress from linkQuence where visited = "0" limit 1"
+            self.cursor.execute(sql)
+            row = self.cursor.fetchone()
+            row=cur.fetchone()
+            return str(row[0])
+            self.cursor.close()       
+            self.conn.close()
         except:
-            return None
-    #u"保证每个url只被访问一次"
-    def addUnvisitedUrl(self,url):
-        if url!="" and url not in self.visted and url not in self.unVisited:
-            self.unVisited.insert(0,url)
-    #u"获得已访问的url数目"
-    def getVisitedUrlCount(self):
-        return len(self.visted)
-    #u"获得未访问的url数目"
-    def getUnvistedUrlCount(self):
-        return len(self.unVisited)
-    #u"判断未访问的url队列是否为空"
-    def unVisitedUrlsEnmpy(self):
-        return len(self.unVisited)==0
-   
+            return None   
+            self.cursor.close()       
+            self.conn.close() 
+
 
 def main(seeds,crawl_count):
     craw=MyCrawler(seeds)
@@ -175,3 +205,5 @@ def main(seeds,crawl_count):
 if __name__=="__main__":
     main("http://www.gjh-enterprise.com/",3000000)
     # main(["http://www.baidu.com","http://www.google.com.hk"],50)
+
+
