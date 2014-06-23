@@ -46,7 +46,8 @@ class MyCrawler:
                 self.MySQLQuence4 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
                 visitUrlList = self.MySQLQuence4.unVisitedUrlDeQuence()
                 print "Pop out one url \"%s\" from unvisited url list" %visitUrlList
-                for visitUrl in visitUrlList:
+                for visitUrlx in visitUrlList:
+                    visitUrl = visitUrlx[0]
                     if visitUrl is None or visitUrl=="":
                         continue
                     #u"获取超链接"
@@ -210,7 +211,7 @@ class MySQLQuence:
             self.cursor.execute(sql)
             results = self.cursor.fetchall()
             for i in results:
-                linkslist.append(str(i))
+                linkslist.append(i)
             return linkslist
             self.cursor.close()       
             self.conn.close()
