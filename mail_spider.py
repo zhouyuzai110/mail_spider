@@ -206,7 +206,6 @@ class MySQLQuence:
             sql = "SELECT linkAddress from linkQuence where visited = 0 limit 1"
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
-            row = cur.fetchone()
             return str(row[0])
             self.cursor.close()       
             self.conn.close()
