@@ -21,7 +21,7 @@ origin_url = "http://www.gjh-enterprise.com/"
 class MyCrawler:
     def __init__(self,seeds):
         #u"使用种子初始化url队列"
-        self.MySQLQuence=MySQLQuence('sqld.duapp.com', 4050, api_key, secret_key, dbname)
+        self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
         if isinstance(seeds,str):
             self.MySQLQuence.addUnvisitedUrl(seeds)
             print "Add the seeds url \"%s\" to the unvisited url list" %seeds
@@ -133,7 +133,7 @@ class MyCrawler:
 
 
 class MySQLQuence:
-    def __init__(self, host, port, user, passwd, db ):
+    def __init__(self, host,  user, passwd, db, port):
     # def __init__(self, host = 'sqld.duapp.com', port = 4050, user = api_key, passwd = secret_key, db = dbname):
         self.host = host
         self.port = port
@@ -141,7 +141,7 @@ class MySQLQuence:
         self.passwd = passwd
         self.db = db
         try:
-            self.conn = MySQLdb.connect(self.host, self.port, self.user, self.passwd, self.db)
+            self.conn = MySQLdb.connect(self.host, self.user, self.passwd, self.db, self.port)
         except MySQLdb.Error,e:
             errormsg = 'Cannot connect to server\nERROR (%s): %s' %(e.args[0],e.args[1])
             print errormsg
