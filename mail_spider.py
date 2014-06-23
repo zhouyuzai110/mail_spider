@@ -21,7 +21,7 @@ origin_url = "http://www.gjh-enterprise.com/"
 class MyCrawler:
     def __init__(self,seeds):
         #u"使用种子初始化url队列"
-        self.MySQLQuence=MySQLQuence(host='sqld.duapp.com', port = 4050, user = api_key, passwd = secret_key, db = dbname)
+        self.MySQLQuence=MySQLQuence()
         if isinstance(seeds,str):
             self.MySQLQuence.addUnvisitedUrl(seeds)
             print "Add the seeds url \"%s\" to the unvisited url list" %seeds
@@ -144,7 +144,7 @@ class MySQLQuence:
  
     #u"保证每个url只被访问一次,插入的链接唯一"    
     def addUnvisitedUrl(self,url):
-        sql = "INSERT INTO `linkQuence`(`linkAddress`,`visited`) SELECT %s,"0" FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s)"
+        sql = "INSERT INTO `linkQuence`(`linkAddress`, `visited`) SELECT %s,`0` FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s)"
         self.cursor.execute(sql,[url,url])
         self.conn.commit()    
         self.cursor.close()       
@@ -153,7 +153,7 @@ class MySQLQuence:
 
     #u"获得已访问的url数目"
     def getVisitedUrlCount(self):
-        sql = "select * from linkQuence where visited = "1""
+        sql = "SELECT * from linkQuence where visited = `1`" 
         count = self.cursor.execute(sql)
         return count 
         self.cursor.close()       
@@ -161,7 +161,7 @@ class MySQLQuence:
           
     #u"获得未访问的url数目"
     def getUnVisitedUrlCount(self):
-        sql = "select * from linkQuence where visited = "0""
+        sql = "SELECT * from linkQuence where visited = `0`"
         count = self.cursor.execute(sql)
         return count  
         self.cursor.close()       
@@ -176,7 +176,7 @@ class MySQLQuence:
 
     #u"判断未访问的url队列是否为空"
     def unVisitedUrlsEnmpy(self):
-        sql = "select * from linkQuence where visited = "0""
+        sql = "SELECT * from linkQuence where visited = `0`"
         count = self.cursor.execute(sql)
         return count == 0 
         self.cursor.close()       
@@ -186,10 +186,10 @@ class MySQLQuence:
     #u"未访问过得url出队列"
     def unVisitedUrlDeQuence(self):
         try:
-            sql = "select linkAddress from linkQuence where visited = "0" limit 1"
+            sql = "SELECT linkAddress from linkQuence where visited = `0` limit 1"
             self.cursor.execute(sql)
             row = self.cursor.fetchone()
-            row=cur.fetchone()
+            row = cur.fetchone()
             return str(row[0])
             self.cursor.close()       
             self.conn.close()
