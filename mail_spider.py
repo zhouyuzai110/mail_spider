@@ -47,7 +47,7 @@ class MyCrawler:
                 visitUrlList = self.MySQLQuence4.unVisitedUrlDeQuence()
                 print "Pop out one url \"%s\" from unvisited url list" %visitUrlList
                 for visitUrlx in visitUrlList:
-                    visitUrl = visitUrlx[0]
+                    visitUrl = str(visitUrlx[0])
                     if visitUrl is None or visitUrl=="":
                         continue
                     #u"获取超链接"
