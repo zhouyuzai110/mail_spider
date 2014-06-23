@@ -44,25 +44,26 @@ class MyCrawler:
             try:
                 #u"队头url出队列"
                 self.MySQLQuence4 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                visitUrl = self.MySQLQuence4.unVisitedUrlDeQuence()
-                print "Pop out one url \"%s\" from unvisited url list"%visitUrl
-                if visitUrl is None or visitUrl=="":
-                    continue
-                #u"获取超链接"
-                links=self.getHyperLinks(visitUrl)
-                print "Get %d new links"%len(links)
-                #u"将url放入已访问的url中"
-                self.MySQLQuence5 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                self.MySQLQuence5.addVisitedUrl(visitUrl)
-                self.getEmailAddress(visitUrl)
-                self.MySQLQuence6 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                print "Visited url count: "+str(self.MySQLQuence6.getVisitedUrlCount())
-                #u"未访问的url入列"
-                for link in links:
-                    self.MySQLQuence7 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                    self.MySQLQuence7.addUnvisitedUrl(link)
-                self.MySQLQuence8 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)    
-                print "%s unvisited links:" %self.MySQLQuence8.getUnVisitedUrlCount()
+                visitUrlList = self.MySQLQuence4.unVisitedUrlDeQuence()
+                print "Pop out one url \"%s\" from unvisited url list" %visitUrlList
+                for visitUrl in visitUrlList:
+                    if visitUrl is None or visitUrl=="":
+                        continue
+                    #u"获取超链接"
+                    links=self.getHyperLinks(visitUrl)
+                    print "Get %d new links"%len(links)
+                    #u"将url放入已访问的url中"
+                    self.MySQLQuence5 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                    self.MySQLQuence5.addVisitedUrl(visitUrl)
+                    self.getEmailAddress(visitUrl)
+                    self.MySQLQuence6 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                    print "Visited url count: "+str(self.MySQLQuence6.getVisitedUrlCount())
+                    #u"未访问的url入列"
+                    for link in links:
+                        self.MySQLQuence7 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                        self.MySQLQuence7.addUnvisitedUrl(link)
+                    self.MySQLQuence8 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)    
+                    print "%s unvisited links:" %self.MySQLQuence8.getUnVisitedUrlCount()
             except Exception,e:
                 print str(e)    
 
@@ -204,10 +205,13 @@ class MySQLQuence:
     #u"未访问过得url出队列"
     def unVisitedUrlDeQuence(self):
         try:
-            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 1"
+            linkslist = []
+            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 30"
             self.cursor.execute(sql)
-            row = self.cursor.fetchone()
-            return str(row[0])
+            results = self.cursor.fetchall()
+            for i in results:
+                linkslist.append(str(i))
+            return linkslist
             self.cursor.close()       
             self.conn.close()
         except:
