@@ -32,50 +32,55 @@ class MyCrawler:
 
     #u"抓取过程主函数"
     def crawling(self,seeds,crawl_count):
-
         #u"循环条件：待抓取的链接不空且专区的网页不多于crawl_count"
         while self.linkQuence.unVisitedUrlsEnmpy() is False and self.linkQuence.getVisitedUrlCount()<=crawl_count:
-            #u"队头url出队列"
-            visitUrl=self.linkQuence.unVisitedUrlDeQuence()
-            print "Pop out one url \"%s\" from unvisited url list"%visitUrl
-            if visitUrl is None or visitUrl=="":
-                continue
-            #u"获取超链接"
-            links=self.getHyperLinks(visitUrl)
-            print "Get %d new links"%len(links)
-            #u"将url放入已访问的url中"
-            self.linkQuence.addVisitedUrl(visitUrl)
-            self.getEmailAddress(visitUrl)
-            print "Visited url count: "+str(self.linkQuence.getVisitedUrlCount())
-            #u"未访问的url入列"
-            for link in links:
-                self.linkQuence.addUnvisitedUrl(link)
-                # self.getEmailAddress(link)
-            print "%d unvisited links:"%len(self.linkQuence.getUnvisitedUrl())
+            try:
+                #u"队头url出队列"
+                visitUrl=self.linkQuence.unVisitedUrlDeQuence()
+                print "Pop out one url \"%s\" from unvisited url list"%visitUrl
+                if visitUrl is None or visitUrl=="":
+                    continue
+                #u"获取超链接"
+                links=self.getHyperLinks(visitUrl)
+                print "Get %d new links"%len(links)
+                #u"将url放入已访问的url中"
+                self.linkQuence.addVisitedUrl(visitUrl)
+                self.getEmailAddress(visitUrl)
+                print "Visited url count: "+str(self.linkQuence.getVisitedUrlCount())
+                #u"未访问的url入列"
+                for link in links:
+                    self.linkQuence.addUnvisitedUrl(link)
+                print "%d unvisited links:"%len(self.linkQuence.getUnvisitedUrl())
+            except Exception,e:
+                print str(e)    
 
             
     #u"获取源码中得超链接"
     def getHyperLinks(self,url):
-        links=[]
-        data=self.getPageSource(url)
-        if data[0]=="200":
-            soup=BeautifulSoup(data[1])
-            a=soup.findAll("a",{"href":re.compile(".*")})
-            for i in a:
-                if "index" in i["href"] and "index" not in url:
-                    target_link = url + i["href"]
-                    links.append(target_link) 
-                elif "index" in i["href"] and "index"  in url:
-                    newUrl = re.sub("index-\d+.html","",url) + i["href"]
-                    links.append(newUrl)
-                else:
-                    target_link = origin_url + i["href"]
-                    links.append(target_link) 
-        return links
+        try:
+            links=[]
+            data=self.getPageSource(url)
+            if data[0]=="200":
+                soup=BeautifulSoup(data[1])
+                a=soup.findAll("a",{"href":re.compile(".*")})
+                for i in a:
+                    if "index" in i["href"] and "index" not in url:
+                        target_link = url + i["href"]
+                        links.append(target_link) 
+                    elif "index" in i["href"] and "index"  in url:
+                        newUrl = re.sub("index-\d+.html","",url) + i["href"]
+                        links.append(newUrl)
+                    else:
+                        target_link = origin_url + i["href"]
+                        links.append(target_link) 
+            return links
+        except Exception,e:
+            print str(e)
+            return None  
     
 
     #u"获取网页源码"
-    def getPageSource(self,url,timeout=1,coding=None):
+    def getPageSource(self,url,timeout=10,coding=None):
         try:
             socket.setdefaulttimeout(timeout)
             req = urllib2.Request(url)
@@ -95,7 +100,7 @@ class MyCrawler:
             return [str(e),None]
     
 
-    def getEmailAddress(self,url,timeout=1):
+    def getEmailAddress(self,url,timeout=10):
         try:
             socket.setdefaulttimeout(timeout)
             mail_req = urllib2.Request(url)
@@ -106,7 +111,7 @@ class MyCrawler:
             for ix in mail_target:
                 mydb = MySQLdb.connect(
                   host   = "sqld.duapp.com",
-                  port   = 4051,
+                  port   = 4050,
                   user   = api_key,
                   passwd = secret_key,
                   db = dbname)
