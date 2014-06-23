@@ -21,30 +21,30 @@ origin_url = "http://www.gjh-enterprise.com/"
 class MyCrawler:
     def __init__(self,seeds):
         #u"使用种子初始化url队列"
-        self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+        self.MySQLQuence1 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
         if isinstance(seeds,str):
-            self.MySQLQuence.addUnvisitedUrl(seeds)
+            self.MySQLQuence1.addUnvisitedUrl(seeds)
             print "Add the seeds url \"%s\" to the unvisited url list" %seeds
         if isinstance(seeds,list):
             for i in seeds:
-                self.MySQLQuence.addUnvisitedUrl(i)
+                self.MySQLQuence1.addUnvisitedUrl(i)
         # print "Add the seeds url \"%s\" to the unvisited url list"%str(self.MySQLQuence.unVisited)
     
 
     #u"抓取过程主函数"
     def crawling(self,seeds,crawl_count):
         #u"循环条件：待抓取的链接不空且抓取的网页不多于crawl_count"
-        self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-        unVisitedUrlsEnmpy = self.MySQLQuence.unVisitedUrlsEnmpy()
+        self.MySQLQuence2 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+        unVisitedUrlsEnmpy = self.MySQLQuence2.unVisitedUrlsEnmpy()
         print unVisitedUrlsEnmpy
-        self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-        VisitedUrlCount = self.MySQLQuence.getVisitedUrlCount()
+        self.MySQLQuence3 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+        VisitedUrlCount = self.MySQLQuence3.getVisitedUrlCount()
         print VisitedUrlCount
         while  unVisitedUrlsEnmpy is False and VisitedUrlCount <= crawl_count:
             try:
                 #u"队头url出队列"
-                self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                visitUrl=self.MySQLQuence.unVisitedUrlDeQuence()
+                self.MySQLQuence4 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                visitUrl = self.MySQLQuence4.unVisitedUrlDeQuence()
                 print "Pop out one url \"%s\" from unvisited url list"%visitUrl
                 if visitUrl is None or visitUrl=="":
                     continue
@@ -52,17 +52,17 @@ class MyCrawler:
                 links=self.getHyperLinks(visitUrl)
                 print "Get %d new links"%len(links)
                 #u"将url放入已访问的url中"
-                self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                self.MySQLQuence.addVisitedUrl(visitUrl)
+                self.MySQLQuence5 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                self.MySQLQuence5.addVisitedUrl(visitUrl)
                 self.getEmailAddress(visitUrl)
-                self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                print "Visited url count: "+str(self.MySQLQuence.getVisitedUrlCount())
+                self.MySQLQuence6 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                print "Visited url count: "+str(self.MySQLQuence6.getVisitedUrlCount())
                 #u"未访问的url入列"
                 for link in links:
-                    self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
-                    self.MySQLQuence.addUnvisitedUrl([link,link])
-                self.MySQLQuence=MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)    
-                print "%d unvisited links:" %self.MySQLQuence.getUnVisitedUrlCount()
+                    self.MySQLQuence7 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)
+                    self.MySQLQuence7.addUnvisitedUrl([link,link])
+                self.MySQLQuence8 = MySQLQuence('sqld.duapp.com', api_key, secret_key, dbname, 4050)    
+                print "%d unvisited links:" %self.MySQLQuence8.getUnVisitedUrlCount()
             except Exception,e:
                 print str(e)    
 
