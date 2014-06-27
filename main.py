@@ -122,7 +122,7 @@ class MySQLQuence(threading.Thread):
         while True:
             try:
                 inmail = self.MySQLqueue.get()
-                print print "========== Conn To MySQL Database, Please Waiting =========="
+                print  "========== Conn To MySQL Database, Please Waiting =========="
                 self.dbconn()
                 sql = "INSERT INTO `gjh-enterprise`(`mailAddress`) SELECT %s FROM dual WHERE not exists (select * from `gjh-enterprise` where mailAddress = %s)"
                 self.cursor.execute(sql,inmail)
