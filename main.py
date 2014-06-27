@@ -108,7 +108,7 @@ def getPageSource(url, timeout = 100, coding = None):
 
 
 class MySQLQuence(threading.Thread):
-    def __init__(self): 
+    def __init__(self,MySQLqueue): 
         threading.Thread.__init__(self)
         self.MySQLqueue = MySQLqueue      
         self.host = 'sqld.duapp.com'
