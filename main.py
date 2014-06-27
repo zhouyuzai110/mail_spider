@@ -59,28 +59,28 @@ class MyCrawler(threading.Thread):
             print str(e)
             return None   
                 
-    #u"获取源码中得超链接"
-    def getHyperLinks(self,url):
-        try:
-            links = []
-            data = self.getPageSource(url)
-            if data[0]=="200":
-                soup=BeautifulSoup(data[1])
-                a=soup.findAll("a",{"href":re.compile(".*")})
-                for i in a:
-                    if "index" in i["href"] and "index" not in url:
-                        target_link = url + "/" + i["href"]
-                        links.append(target_link) 
-                    elif "index" in i["href"] and "index"  in url:
-                        newUrl = re.sub("index-\d+.html","",url) + "/" + i["href"]
-                        links.append(newUrl)
-                    else:
-                        target_link = url + i["href"]
-                        links.append(target_link) 
-            return links
-        except Exception,e:
-            print str(e)
-            return None  
+#u"获取源码中得超链接"
+def getHyperLinks(url):
+    try:
+        links = []
+        data = getPageSource(url)
+        if data[0]=="200":
+            soup=BeautifulSoup(data[1])
+            a=soup.findAll("a",{"href":re.compile(".*")})
+            for i in a:
+                if "index" in i["href"] and "index" not in url:
+                    target_link = url + "/" + i["href"]
+                    links.append(target_link) 
+                elif "index" in i["href"] and "index"  in url:
+                    newUrl = re.sub("index-\d+.html","",url) + "/" + i["href"]
+                    links.append(newUrl)
+                else:
+                    target_link = url + i["href"]
+                    links.append(target_link) 
+        return links
+    except Exception,e:
+        print str(e)
+        return None  
 
 
 #u"获取网页源码"
