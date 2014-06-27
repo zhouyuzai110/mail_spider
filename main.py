@@ -211,12 +211,12 @@ class MySQLQuence(threading.Thread):
 
 def main(): 
     for i in range(7):
-        t = MyCrawler(queue)
+        t = MyCrawler(queue,MySQLqueue)
         t.setDaemon(True)
         t.start()
 
     for i in range(3):
-        t = MySQLQuence(queue)
+        t = MySQLQuence(MySQLqueue)
         t.setDaemon(True)
         t.start()
 
