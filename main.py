@@ -232,7 +232,7 @@ class MySQLQuence:
     def unVisitedUrlDeQuence(self):
         try:
             unVisitList = []
-            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 10"
+            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 6"
             self.cursor.execute(sql)
             results = self.cursor.fetchall()
             for link in results:
@@ -243,7 +243,7 @@ class MySQLQuence:
 
 
 def main(): 
-    for i in range(4):
+    for i in range(5):
         t = MyCrawler(queue)
         t.setDaemon(True)
         t.start()
