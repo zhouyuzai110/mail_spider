@@ -189,7 +189,7 @@ class MySQLQuence:
     #u"保证每个url只被访问一次,插入的链接唯一"    
     def addUnvisitedUrl(self,urllist):
         try:       
-            sql = "INSERT INTO `linkQuence`(`linkAddress`) SELECT %s,%s FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s )"
+            sql = "INSERT INTO `linkQuence`(`linkAddress`,`visited`) SELECT %s,%s FROM dual WHERE not exists (select * from `linkQuence` where linkAddress = %s )"
             self.cursor.executemany(sql,urllist)
             self.conn.commit()   
         except MySQLdb.Error,e:
