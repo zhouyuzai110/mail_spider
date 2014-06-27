@@ -181,7 +181,7 @@ class MySQLQuence:
             self.cursor.executemany(sql,urllist)
             self.conn.commit()   
         except MySQLdb.Error,e:
-            print "Mysql Error %d: %s" % (e.args[0], e.args[1])      
+            print "INSERT INTO `linkQuence` Mysql Error %d: %s" % (e.args[0], e.args[1])      
 
 
     #u"批量插入邮箱地址"    
@@ -191,7 +191,7 @@ class MySQLQuence:
             self.cursor.executemany(sql,urllist)
             self.conn.commit()    
         except MySQLdb.Error,e:
-            print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
+            print "INSERT INTO `gjh-enterprise` Mysql Error %d: %s" % (e.args[0], e.args[1]) 
 
 
     #u"获得已访问的url数目"
@@ -217,7 +217,7 @@ class MySQLQuence:
             self.cursor.executemany(sql,urllist)
             self.conn.commit()
         except MySQLdb.Error,e:
-            print "Mysql Error %d: %s" % (e.args[0], e.args[1]) 
+            print "UPDATE `linkQuence` Mysql Error %d: %s" % (e.args[0], e.args[1]) 
                 
 
     #u"判断未访问的url队列是否为空"
@@ -252,7 +252,6 @@ def main():
         MySQLQuence1 = MySQLQuence()
         MySQLQuence1.dbconn()
         visitUrlList = MySQLQuence1.unVisitedUrlDeQuence()
-        print "Pop out urls \"%s\" from unvisited url list" %visitUrlList
         if visitUrlList is not None:
             queue.put(visitUrlList)
         #u"将url放入已访问的url中"
@@ -264,6 +263,7 @@ def main():
         #u"批量更改访问过地址列表状态"
         MySQLQuence1.addVisitedUrl(updateLinkList)
         MySQLQuence1.dbClose()
+        print "Pop out urls \"%s\" from unvisited url list" %visitUrlList
 
     queue.join()
     
