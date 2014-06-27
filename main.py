@@ -6,47 +6,39 @@ import socket
 import urllib2
 import re
 import MySQLdb
+import threading
+import Queue
 
 dbname = "bxWXpbFfNCAATdSdSaQh"
 api_key = "mpbluSASap9EPbqnFQ39WPDK"
 secret_key = "GHqF6rGnw5X80XTOUCRnPTMbUkaTlIa8"
 table_name = "gjh-enterprise"
 
-
+queue = Queue.Queue(maxsize = 8)
 mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z_.-]+)")
 origin_url = "http://www.gjh-enterprise.com/"
 
 
-class MyCrawler:
-    def __init__(self,seeds):
+class MyCrawler(threading.Thread):
+    def __init__(self,queue):
         #u"使用种子初始化url队列"
+        threading.Thread.__init__(self)
+        self.queue = queue
         self.MySQLQuence = MySQLQuence()
+        self.seeds = origin_url
         self.MySQLQuence.dbconn()
-        self.MySQLQuence.addUnvisitedUrl([(seeds,0,seeds)])
+        self.MySQLQuence.addUnvisitedUrl([(self.seeds,0,self.seeds)])
         self.MySQLQuence.dbClose()
-        print "Add the seeds url \"%s\" to the unvisited url list" %seeds
+        print "Add the seeds url \"%s\" to the unvisited url list" %self.seeds
 
     
 
     #u"抓取过程主函数"
-    def crawling(self,seeds,crawl_count):
-        self.MySQLQuence.dbconn()
-        #u"判断未访问列表是否为空"
-        unVisitedUrlsEnmpy = self.MySQLQuence.unVisitedUrlsEnmpy()
-        #u"计算已访问链接数"
-        VisitedUrlCount = self.MySQLQuence.getVisitedUrlCount()
-        self.MySQLQuence.dbClose()
-        #u"循环条件：待抓取的链接不空且抓取的网页不多于crawl_count"
-        while  unVisitedUrlsEnmpy is False and VisitedUrlCount <= crawl_count:
+    def run(self): 
+        while True:
             try:
-                #u"待访问url出队列"
-                self.MySQLQuence.dbconn()
-                visitUrlList = self.MySQLQuence.unVisitedUrlDeQuence()
-                #self.MySQLQuence.dbClose()
-                print "Pop out urls \"%s\" from unvisited url list" %visitUrlList
-                
+                visitUrlList = self.queue.get()
                 urlLinkList = []
-                updateLinkList = []
                 mailAddressList = []
                 mailAddressInsertList = []
 
@@ -75,29 +67,25 @@ class MyCrawler:
                     if maillink is not None:
                         tmail = (maillink,maillink)
                         mailAddressInsertList.append(tmail)
-
-                #u"将url放入已访问的url中"
-                for visitUrl in visitUrlList:
-                    updateLink = (1,visitUrl)
-                    updateLinkList.append(updateLink)
                     
                 urlLinkListNoCopy = set(urlLinkList)
                 
                 print "Total Ready To Insert MySQL Database Links Are: %d" %len(urlLinkListNoCopy)
                 print "----------Conn To MySQL Database, Please Waiting----------"
-                #self.MySQLQuence.dbconn()    
+                self.MySQLQuence.dbconn()    
                 #u"批量插入邮箱地址列表"
                 self.MySQLQuence.insertMailList(mailAddressInsertList)
                 #u"批量插入待访问地址列表"
                 self.MySQLQuence.addUnvisitedUrl(urlLinkListNoCopy)
-	            #u"批量更改访问过地址列表状态"
-                self.MySQLQuence.addVisitedUrl(updateLinkList)
+                
 
                 # print "Visited Url Count: "+str(self.MySQLQuence.getVisitedUrlCount())
                 # print "%s Unvisited Links " %self.MySQLQuence.getUnVisitedUrlCount()
                 self.MySQLQuence.dbClose()
 
                 print "----------All Things Are Clean, Close MySQL Database----------"
+                self.queue.task_done()
+
             except Exception,e:
                 print str(e)    
 
@@ -169,7 +157,7 @@ class MySQLQuence:
         self.passwd = secret_key
         self.db = dbname
         self.port = 4050
-	    
+        
         
     
     def dbconn(self):
@@ -244,7 +232,7 @@ class MySQLQuence:
     def unVisitedUrlDeQuence(self):
         try:
             unVisitList = []
-            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 30"
+            sql = "SELECT linkAddress from `linkQuence` where visited = 0 limit 10"
             self.cursor.execute(sql)
             results = self.cursor.fetchall()
             for link in results:
@@ -254,10 +242,34 @@ class MySQLQuence:
             return None   
 
 
-def main(seeds,crawl_count):
-    craw = MyCrawler(seeds)
-    craw.crawling(seeds,crawl_count)
+def main(): 
+    for i in range(5):
+        t = MyCrawler(queue)
+        t.setDaemon(True)
+        t.start()
+
+    while True :
+        MySQLQuence1 = MySQLQuence()
+        MySQLQuence1.dbconn()
+        visitUrlList = MySQLQuence1.unVisitedUrlDeQuence()
+        print "Pop out urls \"%s\" from unvisited url list" %visitUrlList
+        if visitUrlList is not None:
+            queue.put(visitUrlList)
+        #u"将url放入已访问的url中"
+        updateLinkList = []
+        for visitUrl in visitUrlList:
+            if visitUrl is not None:
+                updateLink = (1,visitUrl)
+                updateLinkList.append(updateLink)
+        #u"批量更改访问过地址列表状态"
+        MySQLQuence1.addVisitedUrl(updateLinkList)
+        MySQLQuence1.dbClose()
+
+    queue.join()
+    
+
 if __name__ == "__main__":
-    main("http://www.gjh-enterprise.com/",3000000)
+    main()
+
 
 
