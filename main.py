@@ -233,7 +233,6 @@ def main():
 
     queue.join()
     MySQLqueue.join()
-    mailout.close()
 
 if __name__ == "__main__":
     main()
