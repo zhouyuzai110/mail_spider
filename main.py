@@ -38,7 +38,7 @@ class MyCrawler(threading.Thread):
                 if maillist is not None:
                     for mailhit in maillist:
                         if mailhit is not None:
-                            tmail = (maillink,maillink)
+                            tmail = (mailhit,mailhit)
                             MySQLqueue.put(tmail)
 
                 self.queue.task_done()
