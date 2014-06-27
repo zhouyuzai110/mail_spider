@@ -168,7 +168,8 @@ class MySQLQuence:
         self.user = api_key
         self.passwd = secret_key
         self.db = dbname
-	    self.port = 4050
+        self.port = 4050
+	    
         
     
     def dbconn(self):
