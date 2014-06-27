@@ -243,7 +243,7 @@ class MySQLQuence:
 
 
 def main(): 
-    for i in range(5):
+    for i in range(4):
         t = MyCrawler(queue)
         t.setDaemon(True)
         t.start()
