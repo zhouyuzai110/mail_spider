@@ -220,7 +220,7 @@ def main():
         t.setDaemon(True)
         t.start()
 
-    for i in range(2060,2351):
+    for i in range(2071,2351):
         try:
             visitUrl = "http://www.gjh-enterprise.com/ent/%d/" %i
             #u"获取超链接"
