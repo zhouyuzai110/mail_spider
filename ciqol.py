@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*- 
-#http://www.verydemo.com/demo_c122_i1094.html
 
 from bs4 import BeautifulSoup
 import socket
@@ -12,12 +11,11 @@ import MySQLdb
 dbname = "bxWXpbFfNCAATdSdSaQh"
 api_key = "mpbluSASap9EPbqnFQ39WPDK"
 secret_key = "GHqF6rGnw5X80XTOUCRnPTMbUkaTlIa8"
-table_name = "gjh-enterprise"
+table_name = "www.ciqol.com"
 
-queue = Queue.Queue(maxsize = 7)
+queue = Queue.Queue(maxsize = 9)
 MySQLqueue = Queue.Queue(maxsize = 3)
 mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z_.-]+)")
-origin_url = "http://www.gjh-enterprise.com/"
 
 
 class MyCrawler(threading.Thread):
@@ -32,19 +30,22 @@ class MyCrawler(threading.Thread):
             try:
                 visitUrl = self.queue.get()
                 print visitUrl
-
-                #u"提取邮箱地址 返回一个列表"
+                #u"提取邮箱地址 返回一个列表 加入待写入数据库队列"
                 maillist = self.getEmailAddress(visitUrl)
                 if maillist is not None:
                     for mailhit in maillist:
                         if mailhit is not None:
-                            tmail = (mailhit,mailhit)
+                            tmail = (mailhit,visitUrl)
                             MySQLqueue.put(tmail)
-
                 self.queue.task_done()
 
             except Exception,e:
-                print str(e)    
+                print str(e)  
+                # self.dbconn()
+                # sql = "INSERT INTO `www.ciqol.com-error`(`httpAddress`) values(%s)"                
+                # self.cursor.execute(sql,visitUrl)
+                # self.conn.commit()  
+                # self.dbClose()   
 
     def getEmailAddress(self,url,timeout = 100):
         try:
@@ -97,7 +98,6 @@ def getPageSource(url, timeout = 100, coding = None):
         else:
             page=response.read()
             page=page.decode(coding).encode('utf-8')
-
         return ["200",page]
     except Exception,e:
         print str(e)
@@ -117,24 +117,24 @@ class MySQLQuence(threading.Thread):
         self.db = dbname
         self.port = 4050
         
-#     #u"批量插入邮箱地址"    
+     #u"插入邮箱地址"    
     def run(self):
         while True:
             try:
                 inmail = self.MySQLqueue.get()
                 print  "========== Conn To MySQL Database, Please Waiting =========="
                 self.dbconn()
-                sql = "INSERT INTO `gjh-enterprise`(`mailAddress`) SELECT %s FROM dual WHERE not exists (select * from `gjh-enterprise` where mailAddress = %s)"
+                # sql = "INSERT INTO `www.ciqol.com`(`mailAddress`,`httpAddress`) SELECT %s,%s FROM dual WHERE not exists (select * from `gjh-enterprise` where mailAddress = %s)"
+                sql = "INSERT INTO `www.ciqol.com`(`mailAddress`,`httpAddress`) values(%s,%s)"                
                 self.cursor.execute(sql,inmail)
                 self.conn.commit()  
                 self.dbClose() 
                 print "========== All Things Are Clean, Close MySQL Database =========="
                 self.MySQLqueue.task_done()     
             except MySQLdb.Error,e:
-                print "INSERT INTO `gjh-enterprise` Mysql Error %d: %s" % (e.args[0], e.args[1]) 
+                print "INSERT INTO `www.ciqol.com` Mysql Error %d: %s" % (e.args[0], e.args[1]) 
 
-        
-    
+           
     def dbconn(self):
         try:
             self.conn = MySQLdb.connect(self.host, self.user, self.passwd, self.db, self.port)
@@ -157,8 +157,6 @@ class MySQLQuence(threading.Thread):
 #             self.conn.commit()   
 #         except MySQLdb.Error,e:
 #             print "INSERT INTO `linkQuence` Mysql Error %d: %s" % (e.args[0], e.args[1])      
-
-
 
 
 #     #u"获得已访问的url数目"
@@ -210,7 +208,7 @@ class MySQLQuence(threading.Thread):
 
 
 def main(): 
-    for i in range(7):
+    for i in range(9):
         t = MyCrawler(queue,MySQLqueue)
         t.setDaemon(True)
         t.start()
@@ -220,13 +218,11 @@ def main():
         t.setDaemon(True)
         t.start()
 
-    for i in range(2000,2351):
+    for i in range(183730,3660000):
         try:
-            visitUrl = "http://www.gjh-enterprise.com/ent/%d/" %i
-            #u"获取超链接"
-            links = getHyperLinks(visitUrl)
-            for link in links:
-                queue.put(link)
+            visitUrl = "http://information.ciqol.com/buyernew/view/type/buyer/id/%d" %i
+            queue.put(visitUrl)
+            #u"把链接放入待访问队列"
         except Exception,e:
             print str(e)           
  
