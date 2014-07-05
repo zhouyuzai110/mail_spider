@@ -218,7 +218,7 @@ def main():
         t.setDaemon(True)
         t.start()
 
-    for i in range(765470,3660000):
+    for i in range(825475,3660000):
         try:
             visitUrl = "http://information.ciqol.com/buyernew/view/type/buyer/id/%d" %i
             queue.put(visitUrl)
