@@ -13,7 +13,7 @@ api_key = "mpbluSASap9EPbqnFQ39WPDK"
 secret_key = "GHqF6rGnw5X80XTOUCRnPTMbUkaTlIa8"
 table_name = "www.ciqol.com"
 
-queue = Queue.Queue(maxsize = 9)
+queue = Queue.Queue(maxsize = 5)
 MySQLqueue = Queue.Queue(maxsize = 3)
 mailre = re.compile(r"([0-9a-zA-Z_.-]+@[0-9a-zA-Z_.-]+)")
 
@@ -208,7 +208,7 @@ class MySQLQuence(threading.Thread):
 
 
 def main(): 
-    for i in range(9):
+    for i in range(5):
         t = MyCrawler(queue,MySQLqueue)
         t.setDaemon(True)
         t.start()
@@ -218,7 +218,7 @@ def main():
         t.setDaemon(True)
         t.start()
 
-    for i in range(966578,3660000):
+    for i in range(1199861,3660000):
         try:
             visitUrl = "http://information.ciqol.com/buyernew/view/type/buyer/id/%d" %i
             queue.put(visitUrl)
